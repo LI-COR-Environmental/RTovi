@@ -1,7 +1,6 @@
 library(ncdf4)
 library(REddyProc)
 library(httr)
-library(rjson)
 
 #' Conversion Function - converts data in Tovi NetCDF file into dataframe for REddyProc
 #' @param filePath is a character file path to a netcdf file

@@ -4,7 +4,7 @@
 \alias{netCDFToREddyProcDF}
 \title{Conversion Function - converts data in Tovi NetCDF file into dataframe for REddyProc}
 \usage{
-netCDFToREddyProcDF(filePath)
+netCDFToREddyProcDF(x)
 }
 \arguments{
 \item{filePath}{is a character file path to a netcdf file}
