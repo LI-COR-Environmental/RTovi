@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Bart Smeets" />
+
+<meta name="date" content="2017-10-04" />
+
+<title>Getting started with infuser</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting started with infuser</h1>
+<h4 class="author"><em>Bart Smeets</em></h4>
+<h4 class="date"><em>2017-10-04</em></h4>
+
+
+
+<blockquote>
+<p>Note: this is a copy of the README file.</p>
+</blockquote>
+<p><code>infuser</code> is a simple and very basic templating engine for R. It replaces parameters within templates with specified values. Templates can be either contained in a string or in a file.</p>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;infuser&quot;</span>)</code></pre></div>
+<p>If you want to use the most up-to-date version, install using <code>devtools::install_github</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Bart6114/infuser&quot;</span>)</code></pre></div>
+</div>
+<div id="hello-world" class="section level2">
+<h2>Hello World</h2>
+<p>A simple Hello World example that makes use of the <code>magrittr</code> piping workflow.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(infuser)
+<span class="kw">library</span>(magrittr)
+
+<span class="st">&quot;Hello {{var1}}!&quot;</span> <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">infuse</span>(<span class="dt">var1=</span><span class="st">&quot;world&quot;</span>)</code></pre></div>
+<pre><code>## Hello world!</code></pre>
+</div>
+<div id="usage" class="section level2">
+<h2>Usage</h2>
+<div id="working-with-character-strings-as-templates" class="section level3">
+<h3>Working with character strings as templates</h3>
+<p>Let’s have a look at an example string.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_sql&lt;-<span class="st">&quot;SELECT * FROM Customers</span>
+<span class="st">WHERE Year = {{year}}</span>
+<span class="st">AND Month = {{month|3}};&quot;</span></code></pre></div>
+<p>Here the variable parameters are enclosed by <code>{{</code> and <code>}}</code> characters. See <code>?infuse</code> to use your own specification.</p>
+<p>From now on, we suppose the character string <code>my_sql</code> is our template. To show the parameters requested by the template you can run the following.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(infuser)
+<span class="kw">variables_requested</span>(my_sql, <span class="dt">verbose =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## Variables requested by template:</code></pre>
+<pre><code>## &gt;&gt; year</code></pre>
+<pre><code>## &gt;&gt; month (default = 3)</code></pre>
+<p>To fill in the template simply provide the requested parameters.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  <span class="kw">infuse</span>(my_sql, <span class="dt">year=</span><span class="dv">2016</span>, <span class="dt">month=</span><span class="dv">8</span>)</code></pre></div>
+<pre><code>## SELECT * FROM Customers
+## WHERE Year = 2016
+## AND Month = 8;</code></pre>
+<p>You can also provide a named list with the requested parameters.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_list&lt;-<span class="st"> </span>
+<span class="st">  </span><span class="kw">list</span>(<span class="dt">year=</span><span class="dv">2016</span>,
+       <span class="dt">month=</span><span class="dv">8</span>)
+
+<span class="kw">infuse</span>(my_sql, my_list)</code></pre></div>
+<pre><code>## SELECT * FROM Customers
+## WHERE Year = 2016
+## AND Month = 8;</code></pre>
+<p>If a default value is available in the template, it will be used if the parameter is not specified.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">infuse</span>(my_sql, <span class="dt">year=</span><span class="dv">2016</span>)</code></pre></div>
+<pre><code>## SELECT * FROM Customers
+## WHERE Year = 2016
+## AND Month = 3;</code></pre>
+</div>
+<div id="working-with-text-files-as-templates" class="section level3">
+<h3>Working with text files as templates</h3>
+<p>Just like we’re using a string here, a text file can be used. An example text file can be found in the package as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example_file&lt;-
+<span class="st">  </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;sql1.sql&quot;</span>, <span class="dt">package=</span><span class="st">&quot;infuser&quot;</span>)
+
+example_file</code></pre></div>
+<pre><code>## [1] &quot;/private/var/folders/th/n7_sp4sx5073fjg9qzcx0gvr0000gn/T/Rtmp8mrLJw/Rinstd20ca7c24ff/infuser/extdata/sql1.sql&quot;</code></pre>
+<p>Again, we can check which parameters are requested by the template.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">variables_requested</span>(example_file, <span class="dt">verbose =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## Variables requested by template:</code></pre>
+<pre><code>## &gt;&gt; month (default = 3)</code></pre>
+<pre><code>## &gt;&gt; year</code></pre>
+<p>And provide their values.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">infuse</span>(example_file, <span class="dt">year =</span> <span class="dv">2016</span>, <span class="dt">month =</span> <span class="dv">12</span>)</code></pre></div>
+<pre><code>## SELECT LAT_N, CITY, TEMP_F
+## FROM STATS, STATION
+## WHERE MONTH = 12
+## AND YEAR = 2016
+## AND STATS.ID = STATION.ID
+## ORDER BY TEMP_F;</code></pre>
+</div>
+<div id="infusing-vectors" class="section level3">
+<h3>Infusing vectors</h3>
+<p>It is quite easy to infuse a vector.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">years &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">2013</span>,<span class="dv">2014</span>,<span class="dv">2015</span>)
+sql_string &lt;-<span class="st"> &quot;SELECT * FROM T1 WHERE Year IN ({{years}})&quot;</span>
+
+<span class="kw">infuse</span>(sql_string, <span class="dt">years=</span>years)</code></pre></div>
+<pre><code>## SELECT * FROM T1 WHERE Year IN (2013,2014,2015)</code></pre>
+<p>You can also specify the collapse character.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">infuse</span>(sql_string, <span class="dt">years=</span>years, <span class="dt">collapse_char =</span> <span class="st">&quot;;&quot;</span>)</code></pre></div>
+<pre><code>## SELECT * FROM T1 WHERE Year IN (2013;2014;2015)</code></pre>
+</div>
+<div id="processing-transforming-your-inputs" class="section level3">
+<h3>Processing / transforming your inputs</h3>
+<p>A <code>transform_function</code> can be specified in the <code>infuse</code> command. This allows for pre-processing of the parameter values before inserting them in the template.</p>
+<p>What we don’t want to happen is the following:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sql&lt;-<span class="st">&quot;INSERT INTO Students (Name) VALUES ({{name}})&quot;</span>
+name &lt;-<span class="st"> &quot;Robert'); DROP TABLE Students;--&quot;</span>
+
+<span class="kw">infuse</span>(sql, <span class="dt">name =</span> name)</code></pre></div>
+<pre><code>## INSERT INTO Students (Name) VALUES (Robert'); DROP TABLE Students;--)</code></pre>
+<p>Yikes! A way to solve this is to specify your own custom transform function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_transform_function&lt;-<span class="cf">function</span>(v){
+  <span class="co"># replace single quotes with double quotes</span>
+  v&lt;-<span class="kw">gsub</span>(<span class="st">&quot;'&quot;</span>, <span class="st">&quot;''&quot;</span>, v)
+  <span class="co"># encloses the string in single quotes</span>
+  v&lt;-<span class="kw">paste0</span>(<span class="st">&quot;'&quot;</span>,v,<span class="st">&quot;'&quot;</span>)
+  
+  <span class="kw">return</span>(v)
+}
+
+<span class="kw">infuse</span>(sql, <span class="dt">name =</span> name, <span class="dt">transform_function =</span> my_transform_function)</code></pre></div>
+<pre><code>## INSERT INTO Students (Name) VALUES ('Robert''); DROP TABLE Students;--')</code></pre>
+<p>Of course you can also use functions from other packages. Specifically for SQL I advise you to take a look at the <code>dbplyr::build_sql</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">infuse</span>(sql, <span class="dt">name =</span> name, <span class="dt">transform_function =</span> dbplyr<span class="op">::</span>build_sql)</code></pre></div>
+<pre><code>## Warning: Installed Rcpp (0.12.12) different from Rcpp used to build dplyr (0.12.11).
+## Please reinstall dplyr to avoid random crashes or undefined behavior.</code></pre>
+<pre><code>## INSERT INTO Students (Name) VALUES ('Robert''); DROP TABLE Students;--')</code></pre>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

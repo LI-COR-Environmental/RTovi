@@ -1,0 +1,17 @@
+dlogitnorm              dlogitnorm
+invlogit                invlogit
+logit                   logit
+logitnorm-package       Utilities for the logitnormal distribution in R
+modeLogitnorm           modeLogitnorm
+momentsLogitnorm        momentsLogitnorm
+plogitnorm              plogitnorm
+qlogitnorm              qlogitnorm
+rlogitnorm              rlogitnorm
+twCoefLogitnorm         twCoefLogitnorm
+twCoefLogitnormCi       twCoefLogitnormCi
+twCoefLogitnormE        twCoefLogitnormE
+twCoefLogitnormMLE      twCoefLogitnormMLE
+twCoefLogitnormMLEFlat
+                        twCoefLogitnormMLEFlat
+twCoefLogitnormN        twCoefLogitnormN
+twSigmaLogitnorm        twSigmaLogitnorm

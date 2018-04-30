@@ -1,0 +1,15 @@
+is.gp                   Gaussian Process and Gaussian Process Lists
+mlegp                   mlegp: maximum likelihood estimation of
+                        Gaussian process parameters
+mlegp-package           mlegp package
+nugget                  Gaussian Process Nugget Related Functions
+plot.gp                 Diagnostic Plots for Gaussian processes
+plot.gp.list            Diagnostics Plots for Gaussian Process Lists
+plotObservedEffects     Plot Observed Values Vs. Each Dimension of the
+                        Design Matrix
+predict.gp              Gaussian Process Predictions
+print.gp                Gaussian Process Summary Information
+print.gp.list           Gaussian Process List Summary Information
+summary.gp              Gaussian Process Summary Information
+summary.gp.list         Gaussian Process List Summary Information
+uniqueSummary           Summary of outputs for each unique input

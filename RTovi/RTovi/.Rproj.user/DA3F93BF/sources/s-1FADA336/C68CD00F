@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1524860850806.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "C68CD00F",
+    "lastKnownWriteTime" : 1524860881,
+    "last_content_update" : 1524860905243,
+    "path" : "~/Code/R/RTovi/RTovi/RTovi/RTovi/R/comm.R",
+    "project_path" : "R/comm.R",
+    "properties" : {
+        "cursorPosition" : "0,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

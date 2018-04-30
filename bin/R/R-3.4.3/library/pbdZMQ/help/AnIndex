@@ -1,0 +1,67 @@
+pbdZMQ-package	a0_a_pbdZMQ-package
+.pbd_env	a0_b_control
+.zmqopt_get	a0_c_options
+.zmqopt_init	a0_c_options
+.zmqopt_set	a0_c_options
+address	address
+bind.socket	xx_rzmq_wrapper
+C-like Wrapper Functions for ZeroMQ	xx_czmq_wrapper
+connect.socket	xx_rzmq_wrapper
+Context Functions	a0_d_context
+File Transfer Functions	b1_sendrecvfile
+get.pbdZMQ.ldflags	zz_zmq_flags
+get.zmq.cppflags	zz_zmq_flags
+get.zmq.ldflags	zz_zmq_flags
+init.context	xx_rzmq_wrapper
+init.socket	xx_rzmq_wrapper
+Initial Control Functions	a0_c_options
+ls	xx_ls_wrapper
+Message Function	a2_message
+Overwrite shpkg	zz_overwrite_shpkg
+overwrite.shpkg.rpath	zz_overwrite_shpkg
+pbdZMQ	a0_a_pbdZMQ-package
+pbd_opt	a0_b_pbd_opt
+Poll Functions	b3_poll
+random_open_port	random_port
+random_port	random_port
+receive.socket	xx_rzmq_wrapper
+Send Receive Functions	b0_sendrecv
+Send Receive Multiple Raw Buffers	b2_sendrecv_multipart
+send.socket	xx_rzmq_wrapper
+Set Control Functions	a0_b_pbd_opt
+shellexec.wcc	u0_shellexec.wcc
+Socket Functions	a1_socket
+test.load.zmq	zz_zmq_flags
+Utility Functions	xx_utility
+Wrapper Functions for rzmq	xx_rzmq_wrapper
+ZMQ Control Environment	a0_b_control
+ZMQ Control Functions	zz_zmq_control
+ZMQ Flags	zz_zmq_flags
+zmq.bind	a1_socket
+zmq.close	a1_socket
+zmq.connect	a1_socket
+zmq.ctx.destroy	a0_d_context
+zmq.ctx.new	a0_d_context
+zmq.disconnect	a1_socket
+zmq.getsockopt	a1_socket
+ZMQ.MC	zz_zmq_control
+zmq.msg.recv	a2_message
+zmq.msg.send	a2_message
+ZMQ.PO	zz_zmq_control
+zmq.poll	b3_poll
+zmq.poll.free	b3_poll
+zmq.poll.get.revents	b3_poll
+zmq.poll.length	b3_poll
+zmq.recv	b0_sendrecv
+zmq.recv.multipart	b2_sendrecv_multipart
+zmq.recvfile	b1_sendrecvfile
+zmq.send	b0_sendrecv
+zmq.send.multipart	b2_sendrecv_multipart
+zmq.sendfile	b1_sendrecvfile
+zmq.setsockopt	a1_socket
+ZMQ.SO	zz_zmq_control
+zmq.socket	a1_socket
+ZMQ.SR	zz_zmq_control
+ZMQ.ST	zz_zmq_control
+zmq.strerror	xx_utility
+zmq.version	xx_utility

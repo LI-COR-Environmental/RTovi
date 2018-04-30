@@ -1,0 +1,66 @@
+library(ncdf4)
+library(REddyProc)
+
+netCDFToREddyProcDF <- function(filePath) {
+  reddyProcMap = list(
+    H="H", LE="LE", FCO2="NEE", TA="Tair", USTAR="Ustar",
+    RH="rH", SW_IN="Rg", TA="Tair", TS="Tsoil")
+
+  ncdata <- nc_open(filePath)
+  ncVariables = list()
+  for (variable in attributes(ncdata$var)$names) {
+    nameParts = unlist(strsplit(variable, '/'))
+    variableName <- nameParts[length(nameParts)]
+    variableName <- sub("(_\\d){3}$", "", variableName)
+    
+    if (variableName %in% names(reddyProcMap)) {
+      rEddyProcName = reddyProcMap[[variableName]]
+      ncVariables[[rEddyProcName]] <- ncvar_get(ncdata, variable)
+    }
+  }
+  
+  timeStep <- ncatt_get(ncdata, 0, "time_step")
+  startDate <- ncatt_get(ncdata, 0, "full_output_start_date")
+  if (!startDate$hasatt) {
+    startDate <- ncatt_get(ncdata, 0, "biomet_start_date")
+    if (!startDate$hasatt) {
+      stop("NetCDF file is has neither full_output_start_date or biomet_start_date")
+    }
+  }
+
+  if (!timeStep$hasatt) {
+    stop("NetCDF file is does not indicate time_step")
+  }
+  
+  df <- as.data.frame(ncVariables, stringsAsFactors=F)
+  tsInSeconds <- as.numeric(timeStep$value) * 60
+  df$DateTime <- as.POSIXct(startDate$value) + (tsInSeconds * (ncdata$dim$time$vals - 1))
+  nc_close(ncdata)
+  
+  # if contains TA or TS convert from K to C
+  hasTA <- 'Tair' %in% names(df)
+  hasTS <- 'Tsoil' %in% names(df)
+  
+  if (hasTA) {
+    df$Tair <- df$Tair - 273
+  }
+  
+  if (hasTS) {
+    df$Tsoil <- df$Tsoil - 273
+  }
+  
+  #Check to see if VPD is in data
+  hasRH <- 'rH' %in% names(df)
+  hasVPD <- 'VPD' %in% names(df)
+  if (!hasVPD && hasRH && hasTA) {
+    df$VPD <- fCalcVPDfromRHandTair(df$rH, df$Tair)
+  }
+  
+  return (df)
+}
+
+dfToREddyProc <- function(df, siteName="US-LICOR") {
+  columns <- names(df)[!names(df) %in% c('DateTime')]
+  eddyProc <- sEddyProc$new(siteName, df, columns)
+  return(eddyProc)
+}

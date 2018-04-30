@@ -1,0 +1,15 @@
+# NAMESPACE file 
+useDynLib(mlegp, .registration = TRUE)
+exportPattern("^[^\\.]")
+
+S3method(plot, gp)
+S3method(plot, gp.list)
+S3method(plotObservedEffects, gp)
+S3method(predict, gp)
+S3method(print, gp)
+S3method(print, gp.list)
+S3method(summary, gp)
+S3method(summary, gp.list)
+
+importFrom("graphics", "abline", "hist", "lines", "par", "plot")
+importFrom("stats", "qqline", "qqnorm", "var")

@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1524750756468.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3279511891",
+    "id" : "18A4C22",
+    "lastKnownWriteTime" : 1524751166,
+    "last_content_update" : 1524751166705,
+    "path" : "~/Code/R/RTovi/RTovi/mac_build.sh",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "19,22",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "sh"
+}

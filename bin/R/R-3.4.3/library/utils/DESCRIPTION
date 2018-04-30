@@ -1,0 +1,11 @@
+Package: utils
+Version: 3.4.3
+Priority: base
+Title: The R Utils Package
+Author: R Core Team and contributors worldwide
+Maintainer: R Core Team <R-core@r-project.org>
+Description: R utility functions.
+License: Part of R 3.4.3
+Suggests: methods, XML
+NeedsCompilation: yes
+Built: R 3.4.3; x86_64-apple-darwin17.5.0; 2018-04-26 14:03:59 UTC; unix

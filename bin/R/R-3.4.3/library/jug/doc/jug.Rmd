@@ -1,0 +1,491 @@
+---
+title: "Getting started with jug"
+author: "Bart Smeets"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with jug}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+_generated using jug version `r library(jug);sessionInfo()$otherPkgs$jug$Version`_
+
+## <a name="hello"></a>Hello World!
+
+```{r, eval=FALSE}
+library(jug)
+
+jug() %>%
+  get("/", function(req, res, err){
+    "Hello World!"
+  }) %>%
+  simple_error_handler_json() %>%
+  serve_it()
+```
+
+```
+Serving the jug at http://127.0.0.1:8080
+```
+
+## What is jug?
+
+jug is a small web development framework for R which relies heavily upon the ```httpuv``` package. It's main focus is to make building APIs for your code as easy as possible.
+
+jug is not supposed to be either an especially performant nor an uber stable web framework. Other tools (and languages) might be more suited for that. It's main focus is to easily allow you to create APIs for your R code. However, the flexibility of jug means that, in theory, you could built an extensive web framework with it.
+
+## Getting started
+
+To install the latest version use ```devtools```:
+
+```{r, eval=FALSE}
+devtools::install_github("Bart6114/jug")
+```
+
+Or install the CRAN version:
+
+```{r, eval=FALSE}
+install.packags("jug")
+```
+
+Load the library:
+
+```{r}
+library(jug)
+```
+
+## The jug instance
+
+Everything starts with a jug instance. This instance is created by simply calling `jug()`:
+
+```{r, warning=FALSE, message=FALSE}
+jug()
+```
+
+jug is made to work closely with the piping functionality of `magrittr` (`%>%`). The configuration of the jug instance is set up by piping the instance through the various functions explained below.
+
+## Middleware
+
+In terms of middleware, jug somewhat follows the specification of middleware by `Express`. In jug, middleware is a function with access to the __request__ (`req`), __response__ (`res`) and __error__ (`err`) object.
+
+Multiple middlewares can be defined. The order in which the middlewares are added matters. A request will start with being passed through the first middleware added (more specifically the functions specified in it - see next paragraph). It will continue to be passed through the added middlewares until a middleware does not return `NULL` (note: if a value is set using e.g. `res$json("foo")` the body will not be `NULL`). Whatever will be passed by that middleware will be set as the response body. 
+
+Most middleware will accept a `func` or `...` argument to which respectively a function or multiple functions can be passed. If multiple functions are passed; the order in which they are passed will be respected when processing a request. To each function the `req`, `res` and `err` objects will be passed (and they thus should accept them).
+
+### Method insensitive middleware
+
+The `use` function is a method insensitive middleware specifier. While it is method insensitive, it can be bound to a specific path. If the `path` argument (accepts a regex string with `grepl` setting `perl=TRUE`) is set to `NULL` it also becomes path insensitive and will process _every_ request.
+
+A path insensitive example:
+
+```{r, eval=FALSE}
+jug() %>%
+  use(path = NULL, function(req, res, err){
+    "test 1,2,3!"
+    }) %>%
+  serve_it()
+```
+
+```
+$ curl 127.0.0.1:8080/xyz
+test 1,2,3!
+```
+The same example, but path sensitive:
+
+```{r, eval=FALSE}
+jug() %>%
+  use(path = "/", function(req, res, err){
+    "test 1,2,3!"
+    }) %>%
+  serve_it()
+```
+
+```
+$ curl 127.0.0.1:8080/xyz
+curl: (52) Empty reply from server
+
+$ curl 127.0.0.1:8080
+test 1,2,3!
+```
+
+It is however possible to specify a method to bind to using `use` (check out `?use`), this way you can process request methods for which no prespecified middlewares exist.
+
+Note that in the above example errors / missing route handling is missing (the server might crash / not respond), more on that later.
+
+### Method sensitive middleware
+
+In the same style as the request method insensitive middleware, there is request method sensitive middleware available. More specifically, you can use the `get`, `post`, `put` and `delete` functions.
+
+This type of middleware is bound to a path using the `path` argument. If `path` is set to `NULL` it will bind to every request to the path, given that it is of the corresponding request method. 
+
+```{r, eval=FALSE}
+jug() %>%
+  get(path = "/", function(req, res, err){
+    "get test 1,2,3!"
+    }) %>%
+  serve_it()
+```
+
+```
+$ curl 127.0.0.1:8080
+get test 1,2,3!
+```
+
+Middlewares are meant to be chained, so to bind different functions to different paths:
+
+```{r, eval=FALSE}
+jug() %>%
+  get(path = "/", function(req, res, err){
+    "get test 1,2,3 on path /"
+    }) %>%
+  get(path = "/my_path", function(req, res, err){
+    "get test 1,2,3 on path /my_path"
+    }) %>%
+  serve_it()
+```
+
+```
+$ curl 127.0.0.1:8080
+get test 1,2,3 on path /
+
+$ curl 127.0.0.1:8080/my_path
+get test 1,2,3 on path /my_path
+```
+
+### Websocket protocol
+
+By default all middleware convenience function bind to the http protocol. You can however access the jug server through websocket by using the websocket sensitive middleware function `ws`. Below an example echo'ing the incoming message.
+
+```{r, eval=FALSE}
+jug() %>%
+   ws("/echo_message", function(binary, message, res, err){
+    message
+  }) %>%
+  serve_it()
+```
+
+Opening a connection to `ws://127.0.0.1:8080/echo_message` and sending e.g. the message `test` to it will then return the value `test`.
+
+__Please note that websocket support is experimental at this stage.__
+
+### Including elsewhere defined middleware chains
+
+In order to make you code more modular, you can include elsewhere defined middleware chains into your jug instance. To do this you can use a combination of the `collector()` and `include()` functions.
+
+Below a `collector` is defined locally (in the same R script) and `include`d.
+
+```{r, eval=FALSE}
+ collected_mw<-
+    collector() %>%
+    get("/", function(req,res,err){
+      return("test")
+    })
+
+  res<-jug() %>%
+    include(collected_mw) %>%
+    serve_it()
+```
+
+However, it is also possible to `include` a `collector` that is defined in another .R file.
+
+Let's say below is the file `my_middlewares.R`:
+
+```{r, eval=FALSE}
+library(jug)
+
+collected_mw<-
+  collector() %>%
+  get("/", function(req,res,err){
+    return("test2")
+  })
+```
+
+We can include it as follows:
+
+```{r, eval=FALSE}
+res<-jug() %>%
+  include(collected_mw, "my_middlewares.R") %>%
+  serve_it()
+```
+
+## Predefined middleware
+
+### Error handling
+
+A simple error handling middleware (`simple_error_handler` / `simple_error_handler_json`) which catches unbound paths and `func` evaluation errors. If you do not implement a custom error handler, I suggest you add either of these to your jug instance. The `simple_error_handler` returns an HTML error page while the `simple_error_handler_json` returns a JSON message.
+
+```{r, eval=FALSE}
+jug() %>%
+  simple_error_handler() %>%
+  serve_it()
+```
+
+```
+$ curl 127.0.0.1:8080
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Not found</title>
+  </head>
+  <body>
+    <p>No handler bound to path</p>
+  </body>
+</html>
+```
+If you want to implement your own custom error handling just have a look at the code of these simple error handling middlewares.
+
+Please note that generally you would like the error handler middleware to be attached to the jug instance after all other middleware has been specified.
+
+### Easily using your own functions
+
+The main reason jug was created is to easily allow access to your own custom R functions. The convenience function `decorate` is built especially for this purpose.
+
+If you `decorate` your own function it will translate all arguments passed in the query string of the request as arguments to your function. It will also pass all headers to the function as arguments. 
+
+If your function does not accept a `...` argument, all query/header parameters that are not explicitly requested by your function are dropped. If your function requests a `req`, `res` or `err` argument (or `...`) the corresponding objects will be passed. 
+
+```{r, eval=FALSE}
+say_hello<-function(name){paste("hello",name,"!")}
+
+jug() %>%
+  get("/", decorate(say_hello)) %>%
+  serve_it()
+```
+
+If in the above, you pass a parameter `name` through either the query string or as a header in the GET request, it will return as in the example below.
+
+```
+$ curl 127.0.0.1:8080/?name=Bart
+hello Bart !
+```
+
+### Static file server
+
+The `serve_static_file` middleware allows for serving static files.
+
+```{r, eval=FALSE}
+jug() %>%
+  serve_static_files() %>%
+  serve_it()
+```
+
+The default root directory is the one returned by `getwd()` but can be specified by providing a `root_path` argument to the `serve_static_files` middleware. It transforms a bare `/` path to `index.html`.
+
+Aside from development, I do not recommend using jug to serve static files.
+
+### CORS functionality
+
+[CORS functionality](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS) is introduced by the `cors()` middleware function.
+
+Consider the following example.
+
+```{r, eval=FALSE}
+jug() %>%
+  cors() %>%
+  get("/", function(req, res, err){
+    "Hello World!"
+  }) %>%
+  serve_it()
+```
+
+```
+$ curl -v 127.0.0.1:8080/
+*   Trying 127.0.0.1...
+* Connected to 127.0.0.1 (127.0.0.1) port 8080 (#0)
+> GET / HTTP/1.1
+> Host: 127.0.0.1:8080
+> User-Agent: curl/7.43.0
+> Accept: */*
+> 
+< HTTP/1.1 200 OK
+< Content-Type: text/html
+< Access-Control-Allow-Origin: *
+< Access-Control-Allow-Methods: POST,GET,PUT,OPTIONS,DELETE,PATCH
+< Content-Length: 12
+< 
+* Connection #0 to host 127.0.0.1 left intact
+```
+
+As you see this adds some default CORS-headers. Check out `?cors` for the configuration options, note that you can also add CORS headers to a specific path by specifying the `path` parameter. 
+
+### Authentication
+
+Currently there is only built-in support for basic authentication (check: https://www.httpwatch.com/httpgallery/authentication/) through the `auth_basic` middleware function. The middleware will check the request for a valid username / password combination. If an invalid combination is passed, it will return a 401 status, a `WWW-Authenticate` header and a text body which states that there was an authentication error.
+
+First you will need to define a function that accepts `username` and `password` arguments. The funtion should return `TRUE` if the combination is valid and `FALSE` if the combination is invalid. A dummy example is shown below. Note, that this function could also check e.g. a database to validate the combo.
+
+```{r, eval=FALSE}
+# dummy account checker
+account_checker <- function(username, password){
+  # do something to verify the username and password and return TRUE if combination OK
+  all(username == "test_user", 
+      password == "test_password")
+}
+```
+
+Next you need to instantiate the `auth_basic` middleware in you middleware chain. The `auth_basic` function accepts as first parameter the username/password validation function. Below two examples are given. The first one shows how to do authentication for a specific path (`/test`).
+
+```{r, eval=FALSE}
+jug() %>%
+  get("/", function(req, res, err){
+    "/ req"
+  }) %>%
+  get("/test", auth_basic(account_checker), function(req, res, err){
+    "/test req"
+  }) %>%
+  serve_it()
+```
+
+The second example below shows how to activate basic authentication for all paths in the jug instance.
+
+```{r, eval=FALSE}
+jug() %>%
+  use(NULL, auth_basic(account_checker)) %>%
+  get("/", function(req, res, err){
+    "/ req"
+  }) %>%
+  serve_it()
+```
+
+
+## The request, response and error objects
+
+### Request (`req`) object
+
+The `req` object contains the request specifications. It has different attributes:
+
+- `req$params` a named list of the parameters passed by either the query string, a JSON body, URL parameters or a multipart form
+- `req$path` the request path
+- `req$method` the request method
+- `req$raw` the raw request object as passsed by `httpuv`
+- `req$body` the full request body as a character string
+- `req$protocol` either `http` or `websocket`
+- `req$headers` a named list of the headers in the request (as lowercase and stripped from the `HTTP_` prefix provided by the underlying `httpuv` framework)
+
+It has the following functions attached to it:
+
+- `req$get_header(key)` returns the value associated to the specified key in the request (no need to worry about the `HTTP_` prefix)
+- `req$set_header(key, value)` allows to set / alter a header while processing the request (can be useful to pass data to the next middleware)
+- `req$attach(key, value)` attach a variable to `req$params`
+
+### Response (`res`) object
+
+The `res` object contains the response specifications. It has different attributes:
+
+- `res$headers` a named list of the set headers
+- `res$status` the status of the response (defaults to 200)
+- `res$body` the body of the response (is automatically set to be the content of the not `NULL` returning middleware or by methods such as `res$json()`)
+
+It also has a set of functions:
+
+- `res$set_header(key, value)` set a custom header
+- `res$content_type(type)` set your own content type (MIME)
+- `res$set_status(status)` set the status of the response
+- `res$text(body)` to explicitely set the body of the response
+- `res$json(obj, auto_unbox=TRUE)` converts an object to JSON, sets it as the body and set the correct content type
+- `res$plot(plot_obj, base64=TRUE)` convenience function to return a plot object as the response body, the returned plot can either be a base64 representation of the image (default) or the actual binary data
+
+### Error (`err`) object
+
+The `err` object contains a list of errors, accessible through `err$errrors`. You can add an error to this list by calling `err$set(error)`. The error will be converted to a character.
+
+Refer to the "Error handling" paragraph for more details.
+
+## URL dispatching 
+
+The path parameter in the `get`, `post`, ... functions are processed as being regex patterns.
+
+If there are named capture groups in the path definition, they will be attached to the `req$params` object. For example the pattern `/test/(?<id>.*)/(?<id2>.*)` will result in the variables `id` and `id2` (with their respective values) being bound to the `req$params` object.
+
+If a path pattern is not started with a start of string `^` regex token __or__ ended with an end of string token `$`, these will be explicitely inserted at respectively the beginning and end of the path pattern specification. For example the path pattern `/` will be converted to `^/$`.
+
+## Starting the jug instance
+
+Simply call `serve_it()` at the end of your piping chain (see [Hello World!](#hello) example).
+
+## Practical examples
+
+### Minimal CRUD TODO app
+
+A minimal TODO app built in Angular with a jug backend. 
+
+Clone the repository to check it out: [github.com/Bart6114/jug-crud-example](https://github.com/Bart6114/jug-crud-example)
+
+### Exposing a machine learning model
+
+Let's train (in a very simplistic way) a linear regression model on the `mtcars` dataset and assume that our objective is to predict the miles per gallon or `mpg` variable based on the inputs `gear` and `hp`.
+
+```{r}
+head(mtcars)
+
+mpg_model<-
+  lm(mpg~gear+hp, data=mtcars)
+
+summary(mpg_model)
+```
+
+As we went through a lot of hard work to end up with this model (/s), we now want to expose it through an API. This way we allow other people or applications to make predictions using this model.
+
+As a first step we need to build a minimal prediction function. 
+
+```{r}
+predict_mpg <- function(gear, hp){
+  predict(mpg_model, 
+          newdata = data.frame(gear=as.numeric(gear), 
+                               hp=as.numeric(hp)))[[1]]
+}
+```
+
+We can test the function by supplying the `gear` and `hp` arguments.
+
+```{r}
+predict_mpg(gear = 4, hp = 80)
+```
+
+Now, to expose this function as a we API, we need to build a `jug` instance. We can use the built-in `decorate` middleware to ease the integration of the `predict_mpg` function. Below, a minimal example is shown.
+
+```{r, eval=F}
+jug() %>%
+  post("/predict-mpg", decorate(predict_mpg)) %>%
+  simple_error_handler_json() %>%
+  serve_it()
+```
+```
+Serving the jug at http://127.0.0.1:8080
+```
+
+We can now send a http POST request to the `http://127.0.0.1:8080/predict-mpg` url and it will return the predicted value! It works out of the box with either the parameters in a JSON body, as `multipart/form-data` or as a `x-www-form-urlencoded`.
+
+**JSON body**
+
+```sh
+curl -X POST \
+  http://127.0.0.1:8080/predict-mpg \
+  -H 'content-type: application/json' \
+  -d '{"hp": 80, "gear": 4}'
+```
+
+**multipart form**
+
+```sh
+curl -X POST \
+  http://127.0.0.1:8080/predict-mpg \
+  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
+  -F hp=80 \
+  -F gear=4
+```
+
+**urlencode form**
+
+```sh
+curl -X POST \
+  http://127.0.0.1:8080/predict-mpg \
+  -H 'content-type: application/x-www-form-urlencoded' \
+  -d 'gear=4&hp=80'
+```
+
+
+
+
+

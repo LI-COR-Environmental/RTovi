@@ -1,0 +1,2 @@
+export RSTUDIO_WHICH_R=/Users/adammcquistan/Code/R/RTovi/RTovi/bin/R/R-3.4.3/bin/R
+# to open RStudio using this R version: open -na Rstudio after source .rsource

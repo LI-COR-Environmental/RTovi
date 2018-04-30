@@ -1,0 +1,10 @@
+infuse                  Infuse a template with values.
+print.infuse            prints/shows the result of the 'infuse'
+                        function using the 'cat' function
+print_requested_params
+                        Prints requested parameters
+read_template           Reads the template from a file or string
+trim                    Returns string w/o leading or trailing
+                        whitespace
+variables_requested     Shows which variables are requested by the
+                        template

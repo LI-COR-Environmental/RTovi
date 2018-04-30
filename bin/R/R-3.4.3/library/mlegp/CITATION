@@ -1,0 +1,13 @@
+citEntry(entry="article",
+         author = c(person(c("Garrett","M"),"Dancik"),
+                    person(c("Karin","S"),"Dorman")),
+         title = "{mlegp}: statistical analysis for computer models of biological systems using R",
+         journal = "Bioinformatics",
+         year = 2008,
+         volume = 24,
+         number = 17,
+         pages = c(1966,1967),
+         
+textVersion = "Dancik, GM and Dorman, KS (2008). mlegp: statistical analysis for computer models of biological systems using R. Bioinformatics 24(17), pp. 1966-1967"
+)
+

@@ -1,0 +1,308 @@
+% -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
+
+%\VignetteIndexEntry{Full User Manual}
+%\VignetteKeywords{mlegp}
+%\VignettePackage{mlegp}
+
+
+\documentclass[a4paper]{article}
+
+\title{mlegp: an R package for Gaussian process modeling and sensitivity analysis}
+\author{Garrett Dancik}
+
+\SweaveOpts{echo=FALSE}
+\usepackage{a4wide}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\begin{document}
+
+\maketitle
+
+% -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
+
+\section{{\it mlegp}: an overview}
+Gaussian processes (GPs) are commonly used as surrogate statistical models for predicting output of computer experiments (\citealp{Santner2003}). Generally, GPs are both interpolators and smoothers of data and are effective predictors when the response surface of interest is a smooth function of the parameter space. The package {\it mlegp} finds {\it m}aximum {\it l}ikelihood {\it e}stimates of {\it G}aussian {\it p}rocesses for univariate and multi-dimensional responses, for Gaussian processes with Gaussian correlation structures; constant or linear regression mean functions; and for responses with either constant or non-constant variance that can be specified exactly or up to a multiplicative constant. Unlike traditional GP models, GP models implemented in {\it mlegp} are appropriate for modelling heteroscedastic responses where variance is known or accurately estimated. Diagnostic plotting functions, and the sensitivity analysis tools of Functional Analysis of Variance (FANOVA) decomposition, and plotting of main and two-way factor interaction effects are implemented*. Multi-dimensional output can be modelled by fitting independent GPs to each dimension of output, or to the most important principle component weights following singular value decomposition of the output. Plotting of main effects for functional output is also implemented. From within R, a complete list of functions and vignettes can be obtained by calling \lq library(help = ``mlegp")\rq.
+\vskip .2in
+\noindent *Sensitivity analysis functions are currently only available in the {\it full} version of {\it mlegp}, which is available from http://users.nsula.edu/dancikg/mlegp.
+\newcommand{\sigmaNug}[1][2]{\mbox{$\sigma_{\mbox{\scriptsize e}}^#1$}}
+\renewcommand{\th}{\mbox{$^{th}$}}
+
+\section{Gaussian process modeling and diagnostics}
+\subsection{Gaussian processes}
+
+Let $z_{\mbox{\scriptsize known}}$ = $\left[\mbox{z}(\theta^{(1)}), \dots,\mbox{z}(\theta^{(m)})\right]$
+be a vector of {\it observed} responses, where $z(\theta^{(i)})$ is the response at the input vector $\theta^{(i)} = \left[\theta^{(i)}_1, \ldots, \theta^{(i)}_p\right]$, 
+and we are interested in predicting output $z(\theta^{\mbox{\scriptsize (new)}})$ at the untried input $\theta^{\mbox{\scriptsize (new)}}$. The correlation between any two {\it unobserved} responses is assumed to have the form
+\begin{equation}
+C(\beta)_{i,t} \equiv \text{cor}\left(z(\theta^{(i)}), z(\theta^{(t)})\right) = \exp{\left\{\sum_{k=1}^{p}{\left(-\beta_k\left(\theta^{(i)}_k-\theta^{(t)}_k\right)^2\right)}\right\}}\label{eq:cor}.
+\end{equation}
+The correlation matrix C($\beta$) = [C($\beta)]_{i,t}$, and depends on the correlation parameters $\beta = \left[\beta_1, \dots, \beta_p\right]$ 
+
+Let $\mu(\cdot)$ be the mean function for the unconditional mean of any observation, and
+the mean matrix of $z_{\mbox{\scriptsize known}}$ be
+\begin{equation}\label{eq:M}
+M \equiv \left[\mu\left(\theta^{(1)}\right), \ldots, \mu\left(\theta^{(m)}\right)\right].
+\end{equation}
+The vector of observed responses, $z_{\mbox{\scriptsize known}}$, is distributed according to
+\begin{equation}
+z_{\mbox{\scriptsize known}} \sim MVN_{_m}(M, V),
+\label{eq:mvn}
+\end{equation}
+where $V$ is the variance-covariance matrix defined as
+\begin{equation}
+V \equiv \sigma^2_{GP}C(\beta) + N
+\label{eq:Vknown},
+\end{equation}
+where $\sigma^2_{GP}$ is the unconditional variance of an expected response and 
+$N$ is a diagonal {\it nugget matrix} with the $i\th$ diagonal element equal to $\sigmaNug(\theta^{(i)})$, which is variance due to the stochasticity of the response (e.g., random noise) that may depend on $\theta$.
+If output is {\it deterministic}, the nugget is not present so that $\sigmaNug(\theta) \equiv 0$. For {\it stochastic} responses, variance is traditionally taken to be constant so that $\sigmaNug(\theta) \equiv \sigmaNug$ and $N = \sigmaNug I$. 
+The package {\it mlegp} extends the traditional GP model by allowing the user to specify $N$ exactly or $N$ up to a multiplicative constant.
+
+Define $r_i =$ cor$(z(\theta^{(new)}), z(\theta^{(i)}))$, following equation (\ref{eq:cor}), and $r = \left[r_1, \dots, r_m\right]'$. Under the GP assumption, the predictive distribution of $z(\theta^{(new)})$ is normal with mean
+\begin{equation}\label{eq:pred}
+\widehat{z}\left(\theta^{(i)}\right) = \mbox{E}[z(\theta^{(new)})|z_{\mbox{\scriptsize known}}] = \mu(\theta^{(new)}) + \sigma^2_{GP}r'V^{-1}(z_{\mbox{\scriptsize known}}-M)
+\end{equation}
+and variance
+\begin{equation}
+\mbox{Var}[z(\theta^{(new)})|z_{\mbox{\scriptsize known}}] = \sigma^2_{\mbox{\scriptsize GP}} + \sigmaNug(\theta) - \sigma^4_{GP}r'V^{-1}r.
+\label{eq:var}
+\end{equation}
+For more details, see \citet{Santner2003}.
+
+\subsection{Maximum likelihood estimation}
+We first need some additional notation. Mean functions that are constant or linear in design parameters have the form $\mu(\theta) = x(\theta)F$, where $x(\theta)$ is a row vector of regression parameters, and $F$ is a column vector of regression coefficients. Note that for a constant mean function, $x(\cdot)$ $\equiv$ 1 and $F$ is a single value corresponding to the constant mean. The mean matrix $M$ defined in equation (\ref{eq:M}) has the form $M = XF$, where the $i^{\text{th}}$ row of $X$ is equal to $x\left(\theta^{(i)}\right)$. 
+
+Let us also rewrite the variance-covariance matrix V from equation (\ref{eq:Vknown}) to be
+\begin{equation}
+V \equiv \sigma^2_{\mbox{\scriptsize GP}}(C(\beta) + aN_s) \equiv \sigma^2_{\mbox{\scriptsize GP}}W(\beta, a),
+\end{equation}
+where $N_s$ is the nugget matrix specified up to a multiplicative constant, with $N = \sigma^2_{GP}aN_s$
+and the matrix $W$ depends on the correlation parameters $\beta = \left[\beta_1, \dots, \beta_p\right]$ and a proportionality constant $a$.
+
+When the matrix $W$ is fully specified, maximum likelihood estimates of the mean regression parameters and $\sigma^2_{\mbox{\scriptsize GP}}$ exist in closed form and are
+
+\begin{equation}\label{eq:Fhat}
+\widehat{F} = (X^TW^{-1}X)^{-1}X^{T}W^{-1}z_{\mbox{\scriptsize known}}
+\end{equation}
+and
+\begin{equation}\label{eq:sig2hat}
+\widehat{\sigma}^2_{\mbox{\scriptsize GP}} = \frac{1}{m} 
+(z_{\mbox{\scriptsize known}} - \widehat{M})^TW^{-1}
+(z_{\mbox{\scriptsize known}} - \widehat{M}),
+\end{equation}
+where $\widehat{M} = X\widehat{F}$.
+
+
+\subsection{Diagnostics}\label{sec:diag}
+The cross-validated prediction $\widehat{z}_{\mbox{-}i}(\theta^{(i)})$ is the predicted response obtained using equation (\ref{eq:pred}) after removing all responses at input vector $\theta^{(i)}$ from $z_{\mbox{\scriptsize known}}$ to produce
+$z_{\mbox{\scriptsize known},\mbox{\scriptsize -i}}$.
+Note that it is possible for multiple $\theta^{(i)}$'s, for various $i$'s, to be identical, in which case all corresponding observations are removed. The cross-validated residual for this observations is \begin{equation}
+\frac{z(\theta^{(i)}) - z_{\mbox{-}i}(\theta^{(i)})}
+{\sqrt{\mbox{Var}(z(\theta^{(i)}) | z_{\mbox{\scriptsize known},\mbox{\scriptsize -i}} )  }}.
+\end{equation} 
+
+\subsection{What does {\it mlegp} do?}\label{sec:mlegp}
+The package {\it mlegp} extends the standard GP model of (\ref{eq:mvn}), which assumes that $N = \sigmaNug I$, by allowing the user to specify the diagonal nugget matrix $N$ exactly or up to a multiplicative constant (i.e., $N_s$).   
+This extension provides some flexibility for modeling heteroscedastic responses. The user also has the option of fitting a GP with a constant mean (i.e., $\mu(\theta) \equiv \mu_0$ ) or mean functions that are linear regression functions in all elements of $\theta$ (plus an intercept term). For multi-dimensional output,  the user has the option of fitting independent GPs to each dimension (i.e., each type of observation), or to the most important principle component weights following singular value decomposition. The latter is ideal for data rich situations, such as functional output, and is explained further in Section (\ref{sec:SVD}). GP accuracy is analyzed through diagnostic plots of cross-validated predictions and cross-validated residuals, which  were described in Section (\ref{sec:diag}). Sensitivity analysis tools including FANOVA decomposition, and plotting of main and two-way factor interactions are described in Section (\ref{sec:SA}).
+
+The package {\it mlegp} employs two general approaches to GP fitting. In the standard approach, {\it mlegp} uses numerical methods in conjunction with equations (\ref{eq:Fhat}) and (\ref{eq:sig2hat}) to find maximum likelihood estimates  (MLEs) of all GP parameters. However, when replicate runs are available, it is usually more accurate and computationallly more efficient to fit a GP to a collection of {\it sample means} while using a plug-in estimate for the nugget (matrix).
+
+Let $z_{ij} \equiv z_j\left(\theta^{(i)}\right)$ be the $j$\th\ replicate output from the computer model evaluated at the input vector $\theta^{(i)}$, $i = 1, \dots k, j = 1, \dots n_i$, so that the computer model is evaluated $n_i$ times at the input vector $\theta^{(i)}$.
+Let $\overline{z} = \left(\overline{z_{1.}}, \dots \overline{z_{k.}}\right)$ be a collection of $k$ sample mean computer model outputs, where
+\[
+\overline{z_{i.}} = \frac{1}{n_i}\sum_{j=1}^{n_i}z_{ij}
+\]
+is the sample mean output when the computer model is evaluated at $\theta$.
+
+The GP model of $\overline{z}$ is similar to the GP model of $z_{\mbox{\scriptsize known}}$ described above, with the $(i,t)$\th\ element of the matrix $C(\beta)$ 
+given by cor$(\overline{z_{i.}}, \overline{z_{t.}})$, following Eq. (\ref{eq:cor}).
+and the $i$\th\ element of the nugget matrix $N$ given by $\frac{\sigmaNug(\theta)}{n_i}$. The covariance matrix $V$ has the same form as Eq. (\ref{eq:Vknown}). Predicted means and variances have the same form as Eqs. (\ref{eq:pred} - \ref{eq:var}), but with the vector $z_{\mbox{\scriptsize known}}$ replaced by $\overline{z}$. For a fixed nugget term or nugget matrix, the package {\it mlegp} can fit a GP to a set of sample means by using numerical methods in combination with Eq. (\ref{eq:Fhat}) to find the MLE of all remaining GP parameters. The user may specify a value for the constant nugget or nugget matrix to use. Alternatively, if replicate runs are available and a nugget term is not specified, {\it mlegp} will automatically take $N = \sigmaNug I$ and estimate the nugget as 
+\[
+\widehat{\sigma^2_e} = \frac{1}{N-k}\sum_{i=1}^k(n_i-1)s_i^2,
+\]
+where, $s_i^2$ is the sample variance for design point $i$ and $N = \sum_{i=1}^k n_i$. 
+This estimate is the best linear unbiased estimate (BLUE) of $\sigma^2_e$ (which is linear in $s_i^2$).  
+
+The above {\it means} approach is computationally more efficient when replicate runs are available. If the nugget term or nugget matrix is well known or can be accurately estimated, the {\it means} approach is also more accurate than the standard approach. 
+
+\section{Examples: Gaussian process fitting and diagnostics}
+<<echo=FALSE,print=FALSE, eval=TRUE, results=hide>>=
+library(mlegp)
+@
+\subsection{A simple example}
+The function {\it mlegp} is used to fit one or more Gaussian processes (GPs) to a vector or matrix of responses observed under the same set of inputs. Data can be input from within R or read from a text file using the command {\it read.table} (type `?read.table' from within R for more information). The example below shows how to fit multiple GPs to multiple outputs $z1$ and $z2$ for the design matrix $x$.
+Diagnostic plots are obtained using the {\it plot} function, which graphs observed values vs. cross-validated predicted values for each GP. The plot obtained from the code below appears in Figure (\ref{fig:diag1}).
+
+<<print=TRUE, echo=TRUE, results=hide, eval=TRUE>>=
+x = -5:5
+z1 = 10 - 5*x + rnorm(length(x))
+z2 = 7 * sin(x) + rnorm(length(x))
+fitMulti = mlegp(x, cbind(z1,z2))
+plot(fitMulti)
+@
+\begin{figure}[htbp]
+  \begin{center}
+<<fig=true, print=FALSE, echo=FALSE>>=
+plot(fitMulti)
+@
+    \caption{Gaussian process diagnostic plots. Open circles, cross-validated predictions; solid black lines, observed values; solid red lines, confidence bands corresponding to cross-validated predictions $\pm$ standard deviation.}
+    \label{fig:diag1}
+  \end{center}
+\end{figure}
+<<echo = TRUE, results=verbatim, eval=TRUE>>=
+@
+
+After the GPs are fit, simply typing the name of the object (e.g., $fitMulti$) will return basic summary information. 
+<<echo = TRUE, results=verbatim, eval=TRUE>>=
+fitMulti
+@
+We can also access individual Gaussian processes by specifying the index. The code below, for examples, displays summary information for the first Gaussian process, including diagnostic statistics of cross-validated root mean squared error (CV RMSE) and cross-validated root max squared error (CV RMaxSE), where squared error corresponds to the squared difference between cross-validated predictions and observed values.
+<<echo = TRUE, results=verbatim, eval=TRUE>>=
+fitMulti[[1]]
+@
+\subsection{An example with replicate observations}
+When replicate observations are available, and the nugget term (or matrix) is known or can be accurately estimated, it is computationally more efficient and more accurate to use a plug-in estimate for the nugget term (or matrix) and to fit a GP to a set of sample means. This is done by setting `nugget.known = 1' in the call to {\it mlegp}, while still passing in a vector or matrix of all observations. A nugget value can be specified exactly by setting the `nugget' argument to the (estimated) value of $\sigmaNug$ as in the code below.   
+<<print=TRUE, echo=TRUE, results=hide, eval=TRUE>>=
+x = c(1:10, 1:10, 1:10)
+y = x + rnorm(length(x), sd = 1)
+fit = mlegp(x,y, nugget = 1, nugget.known = 1)
+@
+If the argument `nugget' is not specified, a weighted average of sample variances will be used.
+<<print=TRUE, echo=TRUE, results=hide, eval=TRUE>>=
+fit = mlegp(x,y, nugget.known = 1)
+@
+<<print=TRUE, echo = TRUE, results = verbatim, eval=TRUE>>=
+fit$nugget 
+@
+
+\subsection{Heteroscedastic responses and the nugget matrix}
+In cases where the responses are heteroscedastic (have non-constant variance), it is possible to specify the diagonal nugget matrix exactly or up to a multiplicative constant. 
+Currently, we recommend specifying the nugget matrix based on sample variances for replicate design points (which is easily obtained using the function {\it varPerReps}), based on the results of a separate statistical model, or based on prior information.      
+
+In the example below, we demonstrate how to fit a GP with a constant nugget term, a GP where the diagonal nugget matrix is specified up to a multiplicative constant, and a GP where the diagonal nugget matrix is specified exactly. First we generate heteroscedastic data, with variance related to the design parameter.   
+
+<<echo=TRUE, print=TRUE, results=hide, eval=TRUE>>=
+x = seq(0,1,length.out=20)
+z = x + rnorm(length(x), sd = 0.10*x)   # variance is not constant
+@
+
+By default, a nugget term is automatically estimated if there are replicates in the design matrix, and is not estimated otherwise. However, one can estimate a nugget term by specifying an initial scalar value for the \lq nugget\rq\ argument during the call to
+{\it mlegp}. This is done in the code below.  
+
+<<echo=TRUE, print=TRUE, results=hide, eval=TRUE>>=
+fit1 = mlegp(x,z, nugget = mean((0.1*x)**2))
+@
+Alternatively, one can set \lq nugget\rq\ equal $N_s$, which specifies the nugget matrix up to a multiplicative constant, and is demonstrated in the code below. 
+<<echo=TRUE, print=TRUE, results=hide, eval=TRUE>>=
+fit2 = mlegp(x,z, nugget = (.1*x)**2)
+@
+Finally, we completely and {\it exactly} specify the diagonal nugget matrix $N$ by also setting `nugget.known = 1'.  
+<<echo=TRUE, print=TRUE, results=hide, eval=TRUE>>=
+fit3 = mlegp(x,z, nugget.known = 1, nugget = (.1*x)**2)
+@
+We demonstrate the advantage of using a non-constant nugget term by comparing the root mean squared error (RMSE) between the true response and predictions from each fitted GP. 
+Importantly, predictions are less accurate (have higher root mean squared errors) and can have far from nominal coverage probabilities when a constant nugget is incorrectly assumed. 
+<<echo = TRUE, print = TRUE, results = verbatim, eval = TRUE>>=
+sqrt(mean((x-predict(fit1))**2))
+sqrt(mean((x-predict(fit2))**2))
+sqrt(mean((x-predict(fit3))**2))
+@
+
+
+
+
+\section{Sensitivity analysis}\label{sec:SA}
+For a response $y = f(x)$, where $x$ can be multidimensional, sensitivity analysis (SA) is used to (a) quantify the extent in which uncertainty in the response $y$ can be attributed to uncertainty in the design parameters $x$, and (b) characterize how the response changes as one or more design parameters are varied. General SA methods can be found in \citet{Saltelli2000}. SA using Gaussian process models, which is described in \citet{Schonlau2006}, is implemented in the full version of {\it mlegp}, which is available from http://users.nsula.edu/dancikg/mlegp. 
+%\input{SA}
+
+
+\section{Multivariate Output and Dimension Reduction}\label{sec:SVD}
+\subsection{Background}
+For multivariate or functional output, singular value decomposition can be used to reduce the dimensionality of the response \citep{Heitmann2006}.
+Let $\left[z\right]_{i,j}$ , $i$ = 1, \dots, $k$, $j$ = 1, \dots, $m$ be a matrix of $m$ multivariate responses, where column $j$ of the matrix contains the $k$-dimensional output of the response corresponding to the input parameter $\theta^{(j)}$. Also let $r$ = min$(k,m)$. Using singular value decomposition, 
+\begin{equation}\label{eq:SVD}
+\left[z\right]_{i,j} = \left[U_{kxr}D_{rxr}V'_{rxm}\right]_{i,j} = \sum_{p=1}^{r} {\lambda_p \left\{\alpha_p\right\}_i   
+\left\{w_p(\theta)\right\}_j},
+\end{equation}
+where $\lambda_p$ is the $p^{th}$ singluar value, $\alpha_p$ is the $p^{th}$ column of $U$, and $w_p(\theta)$ is the $p^{th}$ row of $V'$. We will refer to the $j^{th}$ column of $V'$, which contains the elements \{$w_p(\theta)\}_j$, $p = 1, \dots, r$, as a vector of {\it principle component weights} corresponding to the $j^{th}$ observation. The output $z$ is approximated by keeping the $l$ < $r$ most important principle component weights, corresponding to the $l$ largest singular values. 
+For a response matrix $z$ as described above, {\it mlegp} fits independent Gaussian processes to the most important principle component weights. The number of principle component weights to be kept is specified through the argument \lq PC.num\rq; alternatively, setting the argument \lq PC.percent\rq \ will keep the most important principle component weights that account for \lq PC.percent\rq \ of the variation in the response. 
+
+\subsection{Examples}
+
+\subsubsection{Basics: Modeling functional output}
+The first example demonstrates the use of {\it mlegp} to fit GPs to principle component weights in order to model functional output. The functional responses are sinusoidal, consisting of 161 points, with a vertical offset determined by the design parameter $p$. We first create the functional responses and plot them. This output is displayed in Figure (\ref{fig:functionalOutput}). 
+
+<<PRINT=false, echo=FALSE, results=hide>>=
+library(mlegp)
+@
+<<PRINT=true, echo = TRUE>>=
+x = seq(-4,4,by=.05)
+p = 1:10
+y = matrix(0,length(p), length(x))
+for (i in 1:length(p)) {
+           y[i,] = sin(x) + .2*i + rnorm(length(x), sd  = .01)
+}
+@
+<<eval = FALSE>>=
+## we now have 10 functional observations (each of length 100) ##
+for (i in p) {
+	plot(x,y[i,], type = "l", col = i, ylim = c(min(y), max(y)))
+        par(new=TRUE)
+}
+@
+\begin{figure}[htbp]\label{fig:SVD1}
+  \begin{center}
+<<fig=true, echo = FALSE, print = FALSE>>=
+     ## we now have 10 functional observations (each of length 100) ##
+     for (i in p) {
+            plot(x,y[i,], type = "l", col = i, ylim = c(min(y), max(y)))
+            par(new=TRUE)
+     }
+@
+    \caption{An example of functional responses where the design parameter determines the vertical offset}
+    \label{fig:functionalOutput}	
+  \end{center}
+\end{figure}
+
+For functional output such as this, it is possible to fit separate GPs to each dimension. However, with 161 dimensions, this is not reasonable. In the code below, we first use the function {\it singularValueImportance} and see that the two most important principle component weights explain more than 99.99\% of the variation in the response. Then, we fit the GPs to these two principle component weights. Note that in the call to {\it mlegp} we take the transpose of the response matrix, so that columns correspond to the functional responses. 
+<<PRINT=TRUE, echo=TRUE,results=verbatim>>=
+     numPCs = 2
+     singularValueImportance(t(y))[numPCs]
+@
+<<PRINT=TRUE, echo=TRUE,results=hide >>=
+     fitPC = mlegp(p, t(y), PC.num = numPCs)
+@
+The GPs, which model principle component weights, can now be used to predict and analyze the functional response, based on the $UDV'$ matrix of equation (\ref{eq:SVD}). The $UD$ matrix corresponding to the principle component weights that are kept is saved as a component of the Gaussian process list object. The R code below demonstrates use of the {\it predict} method to reconstruct (approximately) the original functional output. 
+<<PRINT=TRUE, echo=TRUE,results=hide >>=
+     ## reconstruct the output Y = UDV'
+     Vprime = matrix(0,numPCs,length(p))
+     Vprime[1,] = predict(fitPC[[1]])
+     Vprime[2,] = predict(fitPC[[2]])
+     predY = fitPC$UD %*% Vprime
+@
+
+
+
+\newpage
+\begin{thebibliography}{}
+\bibitem[Heitmann {\it et~al}., 2006]{Heitmann2006} Heitmann, K., Higdon, D., Nakhleh, C., Habib, S., 2006. Cosmic Calibrat
+ion, {\it The Astrophysical Journal}, {\bf646}, 2, L1-L4.
+\bibitem[Saltelli {\it et~al}., 2000]{Saltelli2000} Saltelli, A., Chan, K., Scott, E.M., 2000. Sensitivity analysis. (Chichester; New York: Wiley).
+\bibitem[Santner {\it et~al}., 2003]{Santner2003} Santner, T.J., Williams, B.J., Notz, W., 2003. The Design and Analysis of
+ Computer  Experiments       (New York: Springer).
+\bibitem[Schonlau and Welch, 2006] {Schonlau2006} Schonlau, M. and Welch, W., 2006. Screening the Input Variables to a Comp
+uter Model Via       Analysis of Variance and Visualization, in Screening: Methods for Experimentation in    Industry, Drug
+ Discovery, and Genetics. A. Dean and S. Lewis, eds. (New York:   Springer).
+\end{thebibliography}
+
+\section*{Programming Acknowledgements}
+\begin{itemize}
+\item C code for random number generation provided by Mutsuo Saito, Makoto Matsumoto and Hiroshima University (\url{http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT})
+\item C code for L-BFGS algorithm provided by Naoaki Okazaki (\url{http://www.chokkan.org/software/liblbfgs}) 
+\end{itemize}
+
+\end{document}
+
+

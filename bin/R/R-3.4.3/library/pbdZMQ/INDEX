@@ -1,0 +1,26 @@
+C-like Wrapper Functions for ZeroMQ
+                        The C-like ZeroMQ Interface
+Context Functions       Context Functions
+File Transfer Functions
+                        File Transfer Functions
+Initial Control Functions
+                        Initial controls in pbdZMQ
+Message Function        Message Functions
+Overwrite shpkg         Overwrite rpath of linked shared library in osx
+Poll Functions          Poll Functions
+Send Receive Functions
+                        Send Receive Functions
+Send Receive Multiple Raw Buffers
+                        Send Receive Multiple Raw Buffers
+Set Control Functions   Set controls in pbdZMQ
+Socket Functions        Socket Functions
+Wrapper Functions for rzmq
+                        All Wrapper Functions for rzmq
+ZMQ Control Environment
+                        Sets of controls in pbdZMQ.
+ZMQ Control Functions   Sets of controls in pbdZMQ.
+ZMQ Flags               ZMQ Flags
+address                 Form an Address/Endpoint
+ls                      A wrapper function for base::ls
+pbdZMQ-package          Programming with Big Data - Interface to ZeroMQ
+random_port             Random Port

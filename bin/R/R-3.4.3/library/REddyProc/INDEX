@@ -1,0 +1,199 @@
+BerkeleyJulianDateToPOSIXct
+                        BerkeleyJulianDateToPOSIXct
+DEGebExample            Eddy covariance data from Gebesee crop site,
+                        Germany
+Example_DETha98         Eddy covariance data from Tharandt, Germany
+LightResponseCurveFitter
+                        LightResponseCurveFitter
+LightResponseCurveFitter-class
+                        Class '"LightResponseCurveFitter"'
+LightResponseCurveFitter_computeCost
+                        LightResponseCurveFitter computeCost
+LightResponseCurveFitter_computeLRCGradient
+                        LightResponseCurveFitter computeLRCGradient
+LightResponseCurveFitter_fitLRC
+                        LightResponseCurveFitter fitLRC
+LightResponseCurveFitter_getOptimizedParameterPositions
+                        LightResponseCurveFitter
+                        getOptimizedParameterPositions
+LightResponseCurveFitter_getParameterInitials
+                        LightResponseCurveFitter getParameterInitials
+LightResponseCurveFitter_getParameterNames
+                        LightResponseCurveFitter getParameterNames
+LightResponseCurveFitter_getPriorLocation
+                        LightResponseCurveFitter getPriorLocation
+LightResponseCurveFitter_getPriorScale
+                        LightResponseCurveFitter getPriorScale
+LightResponseCurveFitter_isParameterInBounds
+                        LightResponseCurveFitter isParameterInBounds
+LightResponseCurveFitter_optimLRC
+                        LightResponseCurveFitter optimLRC
+LightResponseCurveFitter_optimLRCBounds
+                        LightResponseCurveFitter optimLRCBounds
+LightResponseCurveFitter_optimLRCOnAdjustedPrior
+                        LightResponseCurveFitter
+                        optimLRCOnAdjustedPrior
+LightResponseCurveFitter_predictGPP
+                        LightResponseCurveFitter predictGPP
+LightResponseCurveFitter_predictLRC
+                        LightResponseCurveFitter predictLRC
+LogisticSigmoidLRCFitter
+                        LogisticSigmoidLRCFitter
+LogisticSigmoidLRCFitter-class
+                        Class '"LogisticSigmoidLRCFitter"'
+LogisticSigmoidLRCFitter_predictGPP
+                        LogisticSigmoidLRCFitter predictGPP
+NonrectangularLRCFitter
+                        NonrectangularLRCFitter
+NonrectangularLRCFitter-class
+                        Class '"NonrectangularLRCFitter"'
+NonrectangularLRCFitter_getParameterNames
+                        NonrectangularLRCFitter getParameterNames
+NonrectangularLRCFitter_predictGPP
+                        NonrectangularLRCFitter predictGPP
+POSIXctToBerkeleyJulianDate
+                        POSIXctToBerkeleyJulianDate
+REddyProc-package       Post Processing of (Half-)Hourly
+                        Eddy-Covariance Measurements
+RHLightResponseCostC    RHLightResponseCostC
+RectangularLRCFitter    RectangularLRCFitter
+RectangularLRCFitter-class
+                        Class '"RectangularLRCFitter"'
+RectangularLRCFitterCVersion
+                        RectangularLRCFitterCVersion
+RectangularLRCFitterCVersion-class
+                        Class '"RectangularLRCFitterCVersion"'
+RectangularLRCFitter_predictGPP
+                        RectangularLRCFitter predictGPP
+fAddNCFVar              fAddNCFVar
+fCalcAVPfromVMFandPress
+                        fCalcAVPfromVMFandPress
+fCalcETfromLE           fCalcETfromLE
+fCalcExtRadiation       fCalcExtRadiation
+fCalcPotRadiation       fCalcPotRadiation
+fCalcRHfromAVPandTair   fCalcRHfromAVPandTair
+fCalcSVPfromTair        fCalcSVPfromTair
+fCalcSunPosition        fCalcSunPosition
+fCalcVPDfromRHandTair   fCalcVPDfromRHandTair
+fCheckHHTimeSeries      fCheckHHTimeSeries
+fConvertCtoK            fConvertCtoK
+fConvertGlobalToVisible
+                        fConvertGlobalToVisible
+fConvertKtoC            fConvertKtoC
+fConvertTimeToPosix     fConvertTimeToPosix
+fConvertVisibleWm2toPhotons
+                        fConvertVisibleWm2toPhotons
+fLloydTaylor            Temperature dependence of soil respiration
+fLoadEuroFlux16         fLoadEuroFlux16
+fLoadFluxNCInfo         Get site information from BGI NetCDF files
+fLoadFluxNCIntoDataframe
+                        Load NetCDF file
+fLoadTXTIntoDataframe   Load text file with one header and one unit row
+                        into data frame
+fReadTimeBerkeley       fReadTimeBerkeley
+fReadTimeSeveralCols    fReadTimeSeveralCols
+fWriteDataframeToFile   fWriteDataframeToFile
+getAmerifluxToBGC05VariableNameMapping
+                        getAmerifluxToBGC05VariableNameMapping
+getBGC05ToAmerifluxVariableNameMapping
+                        getBGC05ToAmerifluxVariableNameMapping
+getExamplePath          getExamplePath
+getFilledExampleDETha98Data
+                        getFilledExampleDETha98Data
+getREddyProcExampleDir
+                        getREddyProcExampleDir
+getTZone                getTZone
+partGLControl           partGLControl
+partGLControlLasslopCompatible
+                        partGLControlLasslopCompatible
+partGLExtractStandardData
+                        partGLExtractStandardData
+partitionNEEGL          partitionNEEGL
+renameVariablesInDataframe
+                        renameVariablesInDataframe
+sEddyProc               sEddyProc
+sEddyProc-class         Class '"sEddyProc"'
+sEddyProc_initialize    sEddyProc_initialize - Initialization of
+                        sEddyProc
+sEddyProc_sCalcPotRadiation
+                        sEddyProc sCalcPotRadiation
+sEddyProc_sEstUstarThreshold
+                        sEddyProc$sEstUstarThreshold - Estimating ustar
+                        threshold
+sEddyProc_sEstUstarThresholdDistribution
+                        sEddyProc sEstUstarThresholdDistribution
+sEddyProc_sExportData   sEddyProc$sExportData - Export internal sDATA
+                        data frame
+sEddyProc_sExportResults
+                        sEddyProc$sExportData - Export internal sTEMP
+                        data frame with result columns
+sEddyProc_sFillInit     sEddyProc$sFillInit - Initialize gap filling
+sEddyProc_sFillLUT      sEddyProc$sFillLUT - Gap filling with Look-Up
+                        Table (LUT)
+sEddyProc_sFillMDC      sEddyProc$sFillMDC - Gap filling with Mean
+                        Diurnal Course (MDC)
+sEddyProc_sGLFluxPartition
+                        sGLFluxPartition: Flux partitioning after
+                        Lasslop et al. (2010)
+sEddyProc_sGetData      sEddyProc$sGetData - Get internal sDATA data
+                        frame
+sEddyProc_sMDSGapFill   sEddyProc$sMDSGapFill - MDS gap filling
+                        algorithm
+sEddyProc_sMDSGapFillAfterUStarDistr
+                        GapFilling for several filters of estimated
+                        friction velocity Ustar thresholds.
+sEddyProc_sMDSGapFillAfterUstar
+                        sEddyProc$sMDSGapFillAfterUstar - MDS gap
+                        filling algorithm after u * filtering
+sEddyProc_sMRFluxPartition
+                        sEddyProc$sMRFluxPartition - Flux partitioning
+                        after Reichstein et al. (2005)
+sEddyProc_sPlotDailySums
+                        sEddyProc$sPlotDailySums - Image with daily
+                        sums of each year
+sEddyProc_sPlotDailySumsY
+                        sEddyProc$sPlotDailySumsY - Plot daily sum of
+                        specified year
+sEddyProc_sPlotDiurnalCycle
+                        sEddyProc$sPlotDiurnalCycle - Image with
+                        diurnal cycles of each month
+sEddyProc_sPlotFingerprint
+                        sEddyProc$sPlotFingerprint - Image with
+                        fingerprints of each year
+sEddyProc_sPlotFingerprintY
+                        sEddyProc$sPlotFingerprintY - Plot fingerprint
+                        of specified year
+sEddyProc_sPlotHHFluxes
+                        sEddyProc sPlotHHFluxes
+sEddyProc_sPlotHHFluxesY
+                        sEddyProc$sPlotHHFluxesY - Plot half-hourly
+                        fluxes of specified year
+sEddyProc_sPlotNEEVersusUStarForSeason
+                        sEddyProc$sPlotNEEVersusUStarForSeason - Image
+                        with NEE versus UStar for each Temperature
+                        class of given season
+sEddyProc_sSetLocationInfo
+                        sEddyProc sSetLocationInfo
+sID                     globalDummyVars
+usControlUstarEst       usControlUstarEst
+usControlUstarSubsetting
+                        usControlUstarSubsetting
+usCreateSeasonFactorMonth
+                        usCreateSeasonFactorMonth
+usCreateSeasonFactorMonthWithinYear
+                        usCreateSeasonFactorMonthWithinYear
+usCreateSeasonFactorYday
+                        usCreateSeasonFactorYday
+usCreateSeasonFactorYdayYear
+                        usCreateSeasonFactorYdayYear
+usEstUstarThreshold     usEstUstarThreshold - Estimating ustar
+                        threshold
+usEstUstarThresholdSingleFw1Binned
+                        usEstUstarThresholdSingleFw1Binned
+usEstUstarThresholdSingleFw2Binned
+                        usEstUstarThresholdSingleFw2Binned
+usGetAnnualSeasonUStarMap
+                        usGetAnnualSeasonUStarMap
+usGetSeasonalSeasonUStarMap
+                        usGetSeasonalSeasonUStarMap
+usGetYearOfSeason       usGetYearOfSeason
