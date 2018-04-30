@@ -2,7 +2,7 @@
 % Please edit documentation in R/conversions.R
 \name{dfToREddyProcClass}
 \alias{dfToREddyProcClass}
-\title{Conversion Function - converts data in Tovi NetCDF file into dataframe for REddyProc}
+\title{Conversion Function - converts data in Tovi generic dataframe into REddyProc class}
 \usage{
 dfToREddyProcClass(df, siteName = "US-LICOR")
 }
@@ -15,5 +15,5 @@ dfToREddyProcClass(df, siteName = "US-LICOR")
 REddyProcClass
 }
 \description{
-Conversion Function - converts data in Tovi NetCDF file into dataframe for REddyProc
+Conversion Function - converts data in Tovi generic dataframe into REddyProc class
 }

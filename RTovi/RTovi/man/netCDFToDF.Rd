@@ -2,7 +2,7 @@
 % Please edit documentation in R/conversions.R
 \name{netCDFToDF}
 \alias{netCDFToDF}
-\title{Conversion Function - converts data in Tovi NetCDF file into dataframe}
+\title{Conversion Function - converts data in Tovi NetCDF file into generic dataframe}
 \usage{
 netCDFToDF(filePath)
 }
@@ -13,5 +13,5 @@ netCDFToDF(filePath)
 dataframe
 }
 \description{
-Conversion Function - converts data in Tovi NetCDF file into dataframe
+Conversion Function - converts data in Tovi NetCDF file into generic dataframe
 }

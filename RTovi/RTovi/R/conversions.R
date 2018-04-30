@@ -2,12 +2,15 @@ library(ncdf4)
 library(REddyProc)
 library(httr)
 
-#' Conversion Function - converts data in Tovi NetCDF file into dataframe for REddyProc
-#' @param filePath is a character file path to a netcdf file
+#' Conversion Function - converts data in Tovi netcdf or dataframe into REddyProc formatted dataframe
+#' @param x is a file path to NetCDF file or a dataframe
 #' @return dataframe
+#' @examples
+#' toviDataToREddyProcDF('path/to/file.nc')
+#' toviDataToREddyProcDF(df)
 #' @export
 
-netCDFToREddyProcDF <- function(x) {
+toviDataToREddyProcDF <- function(x) {
   if(!requireNamespace("ncdf4", quietly=TRUE)) {
     stop("Package 'ncdf4' required in this function.  Please install it.")
   }
@@ -65,9 +68,11 @@ netCDFToREddyProcDF <- function(x) {
 }
 
 
-#' Conversion Function - converts data in Tovi NetCDF file into dataframe
+#' Conversion Function - converts data in Tovi NetCDF file into generic dataframe
 #' @param filePath is a character file path to a netcdf file
 #' @return dataframe
+#' @example
+#' netCDFToDF('path/to/file.nc')
 #' @export
 
 netCDFToDF <- function(filePath) {
@@ -107,10 +112,12 @@ netCDFToDF <- function(filePath) {
 }
 
 
-#' Conversion Function - converts data in Tovi NetCDF file into dataframe for REddyProc
+#' Conversion Function - converts data in Tovi generic dataframe into REddyProc class
 #' @param df a dataframe
 #' @param siteName a site name
 #' @return REddyProcClass
+#' @example 
+#' dfToREddyProcClass(df, siteName="US-LICOR")
 #' @export
 
 dfToREddyProcClass <- function(df, siteName="US-LICOR") {
@@ -134,7 +141,12 @@ fetchToviDataFilePath <- function(dataFileId) {
   return(file)
 }
 
-
+#' Conversion Function - Given datafile Id return a generic Tovi dataframe
+#' @param dataFileId id of a datafile
+#' @return DataFrame
+#' @example 
+#' getToviDataFrame(23)
+#' @export
 getToviDataFrame <- function(dataFileId) {
   filePath <- fetchToviDataFilePath(dataFileId)
   df <- netCDFToDF(filePath)
