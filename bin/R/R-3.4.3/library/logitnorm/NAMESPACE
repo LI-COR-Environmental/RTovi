@@ -1,4 +1,0 @@
-exportPattern("^[^\\.]")	#exports all variables that do not start with a period.
-
-importFrom("stats", "dnorm", "integrate", "optim", "optimize",
-             "plogis", "pnorm", "qlogis", "qnorm", "rnorm")

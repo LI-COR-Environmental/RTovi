@@ -1,3 +1,0 @@
-exportPattern("^[[:alpha:]]+")
-import(ncdf4)
-import(REddyProc)
