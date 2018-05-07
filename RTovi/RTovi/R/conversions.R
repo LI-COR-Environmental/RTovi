@@ -22,7 +22,7 @@ toviDataToREddyProcDF <- function(x) {
     RH="rH", SW_IN="Rg", TA="Tair", TS="Tsoil")
 
   if (is.character(x)) {
-    df <- netCDFToDF(filePath)
+    df <- netCDFToDF(x)
   }
   if (is.data.frame(x)) {
     df <- x
