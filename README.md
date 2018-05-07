@@ -23,3 +23,25 @@ With RTovi installed you can view its functions and their documentation using th
 [4] "netCDFToDF"            "toviDataToREddyProcDF"
 > ?netCDFToDF # this shows the documentation for the netCDFToDF function
 ```
+
+### Examples
+
+Here are some basic examples of using the functions of the RTovi package with data stored in a NetCDF [file](https://github.com/LI-COR/RTovi/blob/master/nc_data.nc).
+
+A. To read the data in a netcdf into a generic dataframe
+
+```
+> df <- netCDFToDF("nc_data.nc")
+```
+
+B. To convert a generic dataframe into one suitable for usage with REddyProc
+
+```
+> rep_df <- toviDataToREddyProcDF(df)
+```
+
+C. To convert a generic dataframe to REddyProc class
+
+```
+> reddyProc <- dfToREddyProcClass(df)
+```
